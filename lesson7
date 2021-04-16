@@ -1,0 +1,70 @@
+/*
+1. Составьте список пользователей users, которые осуществили хотя бы один заказ orders в интернет магазине.
+*/
+
+SELECT 
+	id, 
+	user_id,
+	(SELECT name FROM users WHERE id = orders.user_id) AS names
+FROM orders
+
+/*
+ 2. Выведите список товаров products и разделов catalogs, который соответствует товару.
+ */
+
+SELECT 
+	id,
+	name,
+	catalog_id,
+	(SELECT name FROM catalogs WHERE id = products.catalog_id) AS catalog_name
+FROM products
+
+
+/*
+ 3. (по желанию) Пусть имеется таблица рейсов flights (id, from, to) и таблица городов cities (label, name). 
+ Поля from, to и label содержат английские названия городов, поле name — русское. 
+ Выведите список рейсов flights с русскими названиями городов.
+ */
+
+-- Для удобства вывода составил БД
+
+DROP DATABASE fl;
+
+CREATE DATABASE fl;
+
+USE fl;
+
+
+CREATE TABLE flights(
+	id int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	from_town varchar(145) NOT NULL,
+	to_town varchar(145) NOT NULL
+);
+
+INSERT INTO flights VALUES
+	(1, 'moscow', 'omsk'), 
+	(2, 'novgorod', 'kazan'), 
+	(3, 'irkutsk', 'moscow'),
+	(4, 'omsk', 'irkutsk'),
+	(5, 'moscow', 'kazan');
+
+CREATE TABLE cities(
+	eng varchar(145) NOT NULL,
+	rus varchar(145) NOT NULL,
+	PRIMARY KEY(eng, rus)
+);
+
+INSERT INTO cities VALUES
+	('moscow', 'Москва'), 
+	('irkutsk', 'Иркутск'), 
+	('novgorod', 'Новгород'),
+	('kazan', 'Казань'),
+	('omsk', 'Омск');
+
+-- Вывод данных
+
+SELECT 
+id, 
+(SELECT rus FROM cities WHERE eng = flights.from_town) AS from_town,
+(SELECT rus FROM cities WHERE eng = flights.to_town) AS to_town
+FROM flights
